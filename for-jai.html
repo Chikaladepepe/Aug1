@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>For Jai</title>
+<style>
+  :root{
+    --deep: #241338;
+    --deep2: #34205a;
+    --lav: #b6a3e0;
+    --blue: #6a86e0;
+    --rose: #e6a4c4;
+    --gold: #d9b478;
+    --cream: #f6f1ff;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{
+    margin:0; padding:0; height:100%;
+    background: radial-gradient(120% 120% at 50% 0%, var(--deep2) 0%, var(--deep) 55%, #180b28 100%);
+    font-family: 'Manrope', -apple-system, sans-serif;
+    color: var(--cream);
+    overflow-x:hidden;
+  }
+  @font-face{
+    font-family:'Cormorant';
+    src: local('Cormorant Garamond');
+  }
+  .serif{ font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif; }
+
+  #stars{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+  }
+  .star{
+    position:absolute; width:2px; height:2px; background: var(--lav);
+    border-radius:50%; opacity:0.5;
+    animation: twinkle 4s ease-in-out infinite;
+  }
+  @keyframes twinkle{ 0%,100%{opacity:.15} 50%{opacity:.8} }
+
+  .screen{
+    position:relative; z-index:1;
+    min-height:100svh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding: 32px 24px;
+    text-align:center;
+  }
+
+  /* SCENE 1: envelope */
+  .eyebrow{
+    letter-spacing: 0.3em; text-transform:uppercase; font-size:11px;
+    color: var(--lav); opacity:0.75; margin-bottom: 18px;
+  }
+  .envelope-wrap{
+    width: 180px; height: 130px; position:relative; margin: 28px 0 34px;
+    cursor:pointer;
+  }
+  .envelope-body{
+    position:absolute; inset:0;
+    background: linear-gradient(155deg, var(--rose), var(--gold));
+    border-radius: 6px;
+    box-shadow: 0 20px 50px -12px rgba(214,164,196,0.35), 0 0 0 1px rgba(255,255,255,0.08) inset;
+  }
+  .envelope-flap{
+    position:absolute; top:0; left:0; right:0; height: 70px;
+    background: linear-gradient(155deg, #f0bcd6, var(--gold));
+    clip-path: polygon(0 0, 100% 0, 50% 78%);
+    transform-origin: top center;
+    transition: transform 0.6s cubic-bezier(.6,-0.1,.2,1.3);
+    border-radius: 6px 6px 0 0;
+  }
+  .envelope-wrap.open .envelope-flap{ transform: rotateX(180deg); }
+  .envelope-seal{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width: 34px; height:34px; border-radius:50%;
+    background: var(--deep); color: var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px; z-index:2; font-family:'Playfair Display', serif;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+  #hero-canvas-wrap{
+    width: 100%; max-width: 320px; height: 42vh; min-height: 280px;
+    margin: 10px 0 20px; touch-action: none;
+  }
+  #hero-canvas-wrap canvas{ display:block; width:100%; height:100%; cursor:pointer; }
+  .hero-loading{
+    font-size:12px; color: var(--lav); opacity:0.7; margin-top: -8px; margin-bottom: 8px;
+  }
+  .tap-hint{ font-size:13px; color: var(--lav); opacity:0.8; margin-top: 4px; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{opacity:0.5} 50%{opacity:1} }
+  h1.title{ font-size: 26px; font-weight:600; margin: 0 0 6px; }
+  .sub{ font-size:14px; color: var(--lav); opacity:0.85; max-width:280px; }
+
+  /* SCENE 2: letter */
+  #letterScreen{ display:none; }
+  .letter-card{
+    width: 100%; max-width: 420px;
+    background: linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 18px;
+    padding: 34px 26px 28px;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 24px 60px -20px rgba(0,0,0,0.5);
+    opacity:0; transform: translateY(18px);
+    animation: rise 0.8s cubic-bezier(.2,.8,.2,1) forwards;
+  }
+  @keyframes rise{ to{ opacity:1; transform:none; } }
+  .letter-greeting{ font-size:22px; margin: 0 0 16px; }
+  .letter-body p{
+    font-size: 15.5px; line-height: 1.75; color: rgba(246,241,255,0.92);
+    margin: 0 0 16px; text-align:left;
+  }
+  .signoff{ text-align:right; font-size:16px; margin-top: 10px; font-style: italic; }
+
+  .music-toggle{
+    display:inline-flex; align-items:center; gap:8px;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+    color: var(--cream); border-radius: 999px; padding: 9px 16px;
+    font-size:13px; margin: 18px 0 8px; cursor:pointer;
+  }
+  .bars{ display:flex; gap:2px; align-items:flex-end; height:12px; }
+  .bars span{ width:2px; background: var(--gold); animation: bar 0.9s ease-in-out infinite; }
+  .bars span:nth-child(2){ animation-delay:0.15s } .bars span:nth-child(3){ animation-delay:0.3s }
+  @keyframes bar{ 0%,100%{ height:4px } 50%{ height:12px } }
+  .music-toggle.paused .bars span{ animation-play-state: paused; height:4px; }
+
+  .cta-btn{
+    margin-top: 26px; border:none; cursor:pointer;
+    background: linear-gradient(120deg, var(--rose), var(--blue));
+    color: #1b0f30; font-weight:700; font-size:15px;
+    padding: 15px 30px; border-radius: 999px;
+    box-shadow: 0 12px 30px -10px rgba(106,134,224,0.6);
+    transition: transform 0.2s ease;
+  }
+  .cta-btn:active{ transform: scale(0.96); }
+
+  /* SCENE 3: full model viewer */
+  #finalScreen{ display:none; padding: 20px 0 40px; }
+  .final-header{ padding: 0 24px; margin-bottom: 4px; }
+  .final-header h2{ font-size:22px; margin:0 0 6px; }
+  .final-header p{ font-size:13px; color:var(--lav); opacity:0.85; margin:0; }
+  #final-canvas-wrap{ width:100%; max-width:460px; height: 48vh; min-height:340px; touch-action: none; }
+  canvas{ display:block; width:100%; height:100%; }
+  .hint-row{ font-size:12px; color: var(--lav); opacity:0.7; margin-top:2px; }
+
+  .final-note{ font-size:13px; color:var(--lav); opacity:0.75; margin-top:26px; max-width:280px; }
+  .heart{ color: var(--rose); }
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<!-- SCENE 1 -->
+<div class="screen" id="envelopeScreen">
+  <div class="eyebrow">for jai · august 1</div>
+  <h1 class="title serif">A little something for you</h1>
+  <p class="sub" id="heroSub">Tap the flower when you're ready</p>
+  <div id="hero-canvas-wrap"><canvas id="heroCanvas"></canvas></div>
+  <div class="tap-hint">tap to open</div>
+</div>
+
+<!-- SCENE 2 -->
+<div class="screen" id="letterScreen">
+  <div class="letter-card">
+    <p class="letter-greeting serif">Haii Jaii</p>
+    <div class="letter-body">
+      <p>August 1 and I wanted you to feel special I made this for you I know its not a lot but I hope you know where Im going with it</p>
+      <p>Lately Ive been thinking about us a lot Ever since you came back I felt kind of unsure where I stood and it made me realize how much I actually need you here Not because Im scared of losing you to someone else but because youre the person I keep choosing every single day and I want you to feel that instead of wonder about it</p>
+      <p>I dont think I tell you enough how much you mean to me You are literally the reason my days feel like they have a point to them Even on the days we dont get to talk as much as I want I still think about you nonstop like whats she doing right now is she okay did she eat yet small stuff like that but it means everything to me</p>
+      <p>I love how you laugh at your own jokes before you even finish them I love how you get so into the things you care about I love that even through the distance and the time difference you still make an effort for us and I notice it every time I dont take that for granted</p>
+      <p>You are the one Im building toward Youre my endgame Jai No one else has ever made me feel the way you do and I dont want you questioning that for a second not for one second</p>
+      <p>Happy Girlfriends Day Jai I love you more than this little site could ever show and Im gonna keep showing you until you dont doubt it anymore</p>
+    </div>
+    <p class="signoff serif">Julian</p>
+  </div>
+
+  <div class="music-toggle paused" id="musicToggle">
+    <div class="bars"><span></span><span></span><span></span></div>
+    <span id="musicLabel">Play our song</span>
+  </div>
+
+  <button class="cta-btn" id="revealBtn">See what I made →</button>
+</div>
+
+<!-- SCENE 3 -->
+<div class="screen" id="finalScreen">
+  <div class="final-header">
+    <h2 class="serif">The one I made you</h2>
+    <p>Go ahead, take a full look</p>
+  </div>
+  <div id="final-canvas-wrap"><canvas id="finalCanvas"></canvas></div>
+  <div class="hint-row">drag to rotate</div>
+  <p class="final-note">First time ko mag 3d modeling soo i hope its not too bad <span class="heart">♡</span></p>
+</div>
+
+<audio id="bgAudio" loop preload="none">
+  <!-- Add your own audio clip: replace this src with a hosted file of the "Burnout" chorus (Sugarfree) -->
+  <source src="chorus.mp3" type="audio/mpeg">
+</audio>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/GLTFLoader.js"></script>
+<script>
+// ---------- background stars ----------
+const starsWrap = document.getElementById('stars');
+for(let i=0;i<40;i++){
+  const s = document.createElement('div');
+  s.className='star';
+  s.style.left = Math.random()*100+'%';
+  s.style.top = Math.random()*100+'%';
+  s.style.animationDelay = (Math.random()*4)+'s';
+  starsWrap.appendChild(s);
+}
+
+// ---------- scene 1: 3D flower hero (tap to open letter) ----------
+const envelopeScreen = document.getElementById('envelopeScreen');
+const letterScreen = document.getElementById('letterScreen');
+const heroSub = document.getElementById('heroSub');
+let heroOpened = false;
+
+function openLetter(){
+  if(heroOpened) return;
+  heroOpened = true;
+  envelopeScreen.style.transition = 'opacity 0.45s ease';
+  envelopeScreen.style.opacity = '0';
+  setTimeout(() => {
+    envelopeScreen.style.display = 'none';
+    letterScreen.style.display = 'flex';
+  }, 450);
+
+  // this tap is a real user gesture, so browsers allow us to start
+  // audio here even though autoplay-on-load would normally be blocked
+  const bgAudio = document.getElementById('bgAudio');
+  bgAudio.play().catch(() => {
+    // playback blocked or file missing — the manual toggle below still works
+  });
+}
+
+function initHeroFlower(){
+  const wrap = document.getElementById('hero-canvas-wrap');
+  const canvas = document.getElementById('heroCanvas');
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(38, w/h, 0.1, 100);
+  camera.position.set(0, 0.3, 4.2);
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+  renderer.setSize(w, h);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+  const key = new THREE.DirectionalLight(0xffffff, 1.1);
+  key.position.set(2, 4, 3);
+  scene.add(key);
+  const rim = new THREE.PointLight(0x6a86e0, 0.7);
+  rim.position.set(-3, 1, -2);
+  scene.add(rim);
+
+  const modelGroup = new THREE.Group();
+  scene.add(modelGroup);
+
+  const loader = new THREE.GLTFLoader();
+  let modelLoaded = false;
+  // loads bouquet.glb from the same folder as this HTML file —
+  // keep both files together when you share this
+  loader.load('bouquet.glb', (gltf) => {
+    const model = gltf.scene;
+    // normalize scale/position so it centers nicely regardless of source export
+    const box = new THREE.Box3().setFromObject(model);
+    const size = new THREE.Vector3();
+    box.getSize(size);
+    const center = new THREE.Vector3();
+    box.getCenter(center);
+    const maxDim = Math.max(size.x, size.y, size.z) || 1;
+    const scale = 2.4 / maxDim;
+    model.scale.setScalar(scale);
+    model.position.set(-center.x*scale, -center.y*scale, -center.z*scale);
+    modelGroup.add(model);
+    modelLoaded = true;
+    heroSub.textContent = "Tap the flowers when you're ready";
+  }, undefined, (err) => {
+    console.error('GLTFLoader load error:', err);
+    heroSub.textContent = 'Add bouquet.glb next to this file';
+  });
+
+  let t = 0;
+  let targetRotY = 0.4;
+  let currentRotY = 0.4;
+  let isDragging = false, lastX = 0, dragMoved = false;
+
+  function onDown(e){
+    isDragging = true; dragMoved = false;
+    lastX = e.touches ? e.touches[0].clientX : e.clientX;
+  }
+  function onMove(e){
+    if(!isDragging) return;
+    const x = e.touches ? e.touches[0].clientX : e.clientX;
+    const dx = x - lastX;
+    if(Math.abs(dx) > 2) dragMoved = true;
+    lastX = x;
+    targetRotY += dx * 0.012;
+  }
+  function onUp(){
+    isDragging = false;
+    if(!dragMoved) openLetter();
+  }
+  canvas.addEventListener('mousedown', onDown);
+  canvas.addEventListener('mousemove', onMove);
+  window.addEventListener('mouseup', onUp);
+  canvas.addEventListener('touchstart', onDown, { passive:true });
+  canvas.addEventListener('touchmove', onMove, { passive:true });
+  canvas.addEventListener('touchend', onUp);
+
+  function animate(){
+    requestAnimationFrame(animate);
+    t += 0.01;
+    currentRotY += (targetRotY - currentRotY) * 0.06;
+    modelGroup.rotation.y = currentRotY + Math.sin(t*0.4)*0.03;
+    modelGroup.position.y = Math.sin(t*0.9)*0.06;
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    const nw = wrap.clientWidth, nh = wrap.clientHeight;
+    camera.aspect = nw/nh;
+    camera.updateProjectionMatrix();
+    renderer.setSize(nw, nh);
+  });
+}
+initHeroFlower();
+
+// ---------- music toggle ----------
+const musicToggle = document.getElementById('musicToggle');
+const musicLabel = document.getElementById('musicLabel');
+const audio = document.getElementById('bgAudio');
+
+// reflect the audio element's REAL state, not an assumption —
+// this is what was buggy before: the label changed even if playback
+// silently failed (e.g. no chorus.mp3 file present next to this HTML)
+audio.addEventListener('playing', () => {
+  musicToggle.classList.remove('paused');
+  musicLabel.textContent = 'Playing our song';
+});
+audio.addEventListener('pause', () => {
+  musicToggle.classList.add('paused');
+  musicLabel.textContent = 'Play our song';
+});
+audio.addEventListener('error', () => {
+  musicToggle.classList.add('paused');
+  musicLabel.textContent = 'Add chorus.mp3 next to this file';
+});
+
+musicToggle.addEventListener('click', () => {
+  if(audio.paused){
+    audio.play().catch(() => {
+      musicLabel.textContent = 'Add chorus.mp3 next to this file';
+    });
+  } else {
+    audio.pause();
+  }
+});
+
+// ---------- scene transition ----------
+const finalScreen = document.getElementById('finalScreen');
+let finalInitialized = false;
+document.getElementById('revealBtn').addEventListener('click', () => {
+  letterScreen.style.display = 'none';
+  finalScreen.style.display = 'flex';
+  finalScreen.style.flexDirection = 'column';
+  finalScreen.style.alignItems = 'center';
+  if(!finalInitialized){
+    finalInitialized = true;
+    initFinalViewer();
+  }
+});
+
+// ---------- three.js final model viewer ----------
+function initFinalViewer(){
+  const wrap = document.getElementById('final-canvas-wrap');
+  const canvas = document.getElementById('finalCanvas');
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(40, w/h, 0.1, 100);
+  camera.position.set(0, 0.3, 4.4);
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+  renderer.setSize(w, h);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.95));
+  const key = new THREE.DirectionalLight(0xffffff, 1.1);
+  key.position.set(2, 4, 3);
+  scene.add(key);
+  const rim = new THREE.PointLight(0x6a86e0, 0.7);
+  rim.position.set(-3, 1, -2);
+  scene.add(rim);
+
+  const modelGroup = new THREE.Group();
+  scene.add(modelGroup);
+
+  const loader = new THREE.GLTFLoader();
+  loader.load('bouquet.glb', (gltf) => {
+    const model = gltf.scene;
+    const box = new THREE.Box3().setFromObject(model);
+    const size = new THREE.Vector3();
+    box.getSize(size);
+    const center = new THREE.Vector3();
+    box.getCenter(center);
+    const maxDim = Math.max(size.x, size.y, size.z) || 1;
+    const scale = 2.6 / maxDim;
+    model.scale.setScalar(scale);
+    model.position.set(-center.x*scale, -center.y*scale, -center.z*scale);
+    modelGroup.add(model);
+  }, undefined, (err) => {
+    console.error('GLTFLoader load error:', err);
+  });
+
+  // free drag to rotate, no tap action needed here — just let her look at it
+  let t = 0;
+  let targetRotY = 0.4;
+  let currentRotY = 0.4;
+  let isDragging = false, lastX = 0;
+
+  function onDown(e){
+    isDragging = true;
+    lastX = e.touches ? e.touches[0].clientX : e.clientX;
+  }
+  function onMove(e){
+    if(!isDragging) return;
+    const x = e.touches ? e.touches[0].clientX : e.clientX;
+    const dx = x - lastX;
+    lastX = x;
+    targetRotY += dx * 0.012;
+  }
+  function onUp(){ isDragging = false; }
+
+  canvas.addEventListener('mousedown', onDown);
+  canvas.addEventListener('mousemove', onMove);
+  window.addEventListener('mouseup', onUp);
+  canvas.addEventListener('touchstart', onDown, { passive:true });
+  canvas.addEventListener('touchmove', onMove, { passive:true });
+  canvas.addEventListener('touchend', onUp);
+
+  function animate(){
+    requestAnimationFrame(animate);
+    t += 0.01;
+    currentRotY += (targetRotY - currentRotY) * 0.06;
+    modelGroup.rotation.y = currentRotY + Math.sin(t*0.3) * 0.02;
+    modelGroup.position.y = Math.sin(t*0.8) * 0.05;
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    const nw = wrap.clientWidth, nh = wrap.clientHeight;
+    camera.aspect = nw/nh;
+    camera.updateProjectionMatrix();
+    renderer.setSize(nw, nh);
+  });
+}
+</script>
+</body>
+</html>
